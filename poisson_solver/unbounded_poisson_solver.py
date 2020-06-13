@@ -93,7 +93,7 @@ class UnboundedPoissonSolver:
         return fft2(GF)
 
     def solve(self, rhs):
-        """ solve \delta^2 u = -f
+        r""" solve \delta^2 u = -f
         Careful : pass in -f to be solved!
         """
         self.rhs_doubled[: self.grid_size, : self.grid_size] = -rhs.copy()

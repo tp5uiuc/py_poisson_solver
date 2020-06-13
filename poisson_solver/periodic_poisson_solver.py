@@ -22,7 +22,7 @@ class PeriodicPoissonSolver:
         self.laplacian_in_fourier_domain[0, 0] = np.inf
 
     def solve(self, rhs):
-        """ solve \delta^2 u = -f
+        r""" solve \delta^2 u = -f
         Careful : pass in -f to be solved!
         """
         sol = ifft2(fft2(-rhs) / self.laplacian_in_fourier_domain)

@@ -41,7 +41,7 @@ def make_poisson_solver(
                 solver = UnboundedPoissonSolver(
                     grid_size, dx, order=(order_of_accuracy)
                 )
-    except:
+    except:  # noqa
         # TODO : better handling
         print("Unexpected error")
         raise

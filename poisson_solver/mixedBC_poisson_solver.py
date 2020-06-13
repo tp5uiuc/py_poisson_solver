@@ -1,9 +1,11 @@
 import numpy as np
 from numpy.fft import fft2, ifft2, fftfreq, fft
+
 try:
     from poisson_solver_order import PoissonOrder
 except ImportError:
     from .poisson_solver_order import PoissonOrder
+
 
 class MixedBCPoissonSolver:
     def __init__(
@@ -124,7 +126,7 @@ class MixedBCPoissonSolver:
         return greens_function_in_fourier_domain
 
     def solve(self, rhs):
-        """ solve \delta^2 u = -f
+        r""" solve \delta^2 u = -f
         Careful : pass in -f to be solved!
         """
         self.rhs_doubled[self.y_slice, self.x_slice] = -rhs.copy()

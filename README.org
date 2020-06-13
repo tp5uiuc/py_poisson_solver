@@ -1,15 +1,10 @@
 #+TITLE: pyPoissonSolver
 #+DATE: <2020-06-13 Sat>
 
+[[https://travis-ci.com/github/tp5uiuc/py_poisson_solver][https://travis-ci.com/tp5uiuc/py_poisson_solver.svg?token=ZZkcxuTHm9peGgncAAKa&branch=master]]
 [[https://unlicense.org/][https://img.shields.io/badge/license-Unlicense-blue.svg]]
 
-This is a small library for solving the poisson equation
-
-[[https://latex.codecogs.com/svg.latex?\nabla^2&space;\phi&space;=&space;-f][\nabla^2 \phi = -f]]
-[[https://latex.codecogs.com/svg.latex?\nabla^2&space;\phi&space;=&space;-f]]
-<img src="https://latex.codecogs.com/svg.latex?\nabla^2&space;\phi&space;=&space;-f" title="\nabla^2 \phi = -f" />
-
-on unit unbounded and periodic domains.
+This is a small library for solving the poisson equation [[https://latex.codecogs.com/svg.latex?\nabla^2&space;\phi&space;=&space;-f][\nabla^2 \phi = -f]] on unit unbounded and periodic domains.
 
 * Installing prerequisites
   To install prerequisites for running the script, do
