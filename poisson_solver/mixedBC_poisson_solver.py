@@ -26,6 +26,10 @@ class MixedBCPoissonSolver:
         y_size = self.grid_size
         self.x_slice = slice(None, self.grid_size)
         self.y_slice = slice(None, None)
+
+        if not isinstance(order, PoissonOrder):
+            raise RuntimeError("order passed in is not a valid PoissonOrder!")
+
         self.fourier_GF = MixedBCPoissonSolver.construct_greens_function(
             grid_size, dx, order
         )

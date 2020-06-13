@@ -9,9 +9,12 @@ except ImportError:
 
 class UnboundedPoissonSolver:
     def __init__(self, grid_size: int, dx: float, order: PoissonOrder):
+        if not isinstance(order, PoissonOrder):
+            raise RuntimeError("order passed in is not a valid PoissonOrder!")
         self.fourier_GF = UnboundedPoissonSolver.construct_greens_function(
             grid_size, dx, order
         )
+
         self.dx = dx
         self.grid_size = grid_size
         self.rhs_doubled = np.zeros((2 * self.grid_size, 2 * self.grid_size))
