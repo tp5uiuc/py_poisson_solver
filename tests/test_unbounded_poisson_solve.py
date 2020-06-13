@@ -3,8 +3,8 @@ import pytest
 import numpy as np
 from trial_functions import make_bump
 
-class TestUnboundedPoissonSolver:
 
+class TestUnboundedPoissonSolver:
     @pytest.mark.parametrize("order", range(0, 11, 2))
     def test_error_at_high_resolution(self, order):
         n_points = 256

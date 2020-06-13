@@ -3,8 +3,8 @@ import pytest
 import numpy as np
 from trial_functions import make_periodic_profile
 
-class TestPeriodicPoissonSolver:
 
+class TestPeriodicPoissonSolver:
     def test_error_at_high_resolution(self):
         n_points = 256
         dx = 1.0 / n_points

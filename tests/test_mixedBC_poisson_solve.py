@@ -3,8 +3,8 @@ import pytest
 import numpy as np
 from trial_functions import make_oned_periodic_bump
 
-class TestMixedBCPoissonSolver:
 
+class TestMixedBCPoissonSolver:
     @pytest.mark.parametrize("order", range(0, 11, 2))
     @pytest.mark.parametrize("periodicity_direction", ["x", "y"])
     def test_error_at_high_resolution(self, order, periodicity_direction):
@@ -22,7 +22,9 @@ class TestMixedBCPoissonSolver:
             psi_analytical = psi_analytical.T
             vort = vort.T
 
-        poisson_solver = MixedBCPoissonSolver(n_points, dx, PoissonOrder(order), periodicity_direction)
+        poisson_solver = MixedBCPoissonSolver(
+            n_points, dx, PoissonOrder(order), periodicity_direction
+        )
         psi_numerical = poisson_solver.solve(vort)
 
         psi_net_error = np.linalg.norm(
