@@ -1,6 +1,8 @@
 pytest>=4.6
+coverage
 pytest-cov
-flake8
 codecov
+coveralls
 black
 pylint
+flake8
