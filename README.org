@@ -1,0 +1,47 @@
+#+TITLE: Poisson Solver
+#+DATE: <2020-06-13 Sat>
+
+[[https://unlicense.org/][https://img.shields.io/badge/license-Unlicense-blue.svg]]
+
+This is a small library for solving the poisson equation
+[[https://latex.codecogs.com/svg.latex?\nabla^2&space;\phi&space;=&space;-f][\nabla^2 \phi = -f]]
+on unit unbounded and periodic domains.
+
+* Installing prerequisites
+  To install prerequisites for running the script, do
+  #+begin_src sh
+	pip install -r requirements.txt
+  #+end_src
+  This installs the ~numpy,scipy~ and ~matplotlib~ scientific stack on your
+  system.
+
+* Usage
+To make the poisson solver, use
+#+begin_src python
+  from poisson_solver import make_poisson_solver, PoissonOrder
+  solver = make_poisson_solver(
+	  grid_size, # number of points preferably 2**n
+	  dx, # grid spacing
+	  x_boundary_condition="unbounded", # x direction boundary condition
+	  y_boundary_condition="periodic", # y direction boundary condition
+	  order_of_accuracy=PoissonOrder(4) # order of accuracy needed
+  )
+#+end_src
+where
+- ~x_boundary_condition~ is one of ~unbounded~ or ~periodic~
+- ~y_boundary_condition~ is one of ~unbounded~ or ~periodic~
+- ~order_of_accuracy~ is one of ~0, 2, 4, 6, 8, 10~. ~0~ does not mean
+  zero-order accuracy, but represents the /unregularized/ version and is always
+  second order accurate.
+
+~order_of_accuracy~ does not matter for purely periodic domains : the solver is
+spectrally accurate in this case (accuracy till machine precision if function
+can be properly resolved)
+
+* Convergence plots
+  + For unbounded simulations :
+[[file:docs/convergence_unbounded.png][convergence_unbounded]]
+  + For mixed unbounded-periodic simulations:
+[[file:docs/convergence_mixed.png][convergence_mixed]]
+  + For pure periodic simulations:
+[[file:docs/convergence_periodic.png]]
