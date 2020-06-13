@@ -1,10 +1,14 @@
-#+TITLE: Poisson Solver
+#+TITLE: pyPoissonSolver
 #+DATE: <2020-06-13 Sat>
 
 [[https://unlicense.org/][https://img.shields.io/badge/license-Unlicense-blue.svg]]
 
 This is a small library for solving the poisson equation
+
 [[https://latex.codecogs.com/svg.latex?\nabla^2&space;\phi&space;=&space;-f][\nabla^2 \phi = -f]]
+[[https://latex.codecogs.com/svg.latex?\nabla^2&space;\phi&space;=&space;-f]]
+<img src="https://latex.codecogs.com/svg.latex?\nabla^2&space;\phi&space;=&space;-f" title="\nabla^2 \phi = -f" />
+
 on unit unbounded and periodic domains.
 
 * Installing prerequisites
@@ -40,8 +44,8 @@ can be properly resolved)
 
 * Convergence plots
   + For unbounded simulations :
-[[file:docs/convergence_unbounded.png][convergence_unbounded]]
+[[file:docs/convergence_unbounded.jpg]]
   + For mixed unbounded-periodic simulations:
-[[file:docs/convergence_mixed.png][convergence_mixed]]
+[[file:docs/convergence_mixed.jpg]]
   + For pure periodic simulations:
-[[file:docs/convergence_periodic.png]]
+[[file:docs/convergence_periodic.jpg]]
