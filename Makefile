@@ -4,8 +4,7 @@ black:
 
 black_check:
 	@black --version
-	@find . -maxdepth 3 -name '*.py'\
-		| while read -r src; do black --check "$$src"; done
+	@black --check poisson_solver tests
 
 isort:
 	@isort --version

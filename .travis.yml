@@ -40,7 +40,7 @@ script:
 after_success:
   - coverage report
   - codecov -t "${CODECOV_TOKEN}"
-  - COVERALLS_REPO_TOKEN="${COVERALLS_REPO_TOKEN}" coveralls
+  - COVERALLS_REPO_TOKEN="${COVERALLS_REPO_TOKEN}" coveralls debug
   # - if [[ "$TRAVIS_PYTHON_VERSION" == "3.6" ]]; then
   #     bash <(curl -s https://codecov.io/bash)
   #     # codecov;

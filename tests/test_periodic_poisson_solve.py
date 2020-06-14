@@ -1,6 +1,7 @@
-from poisson_solver import PoissonOrder, PeriodicPoissonSolver
-import pytest
 import numpy as np
+import pytest
+
+from poisson_solver import PeriodicPoissonSolver, PoissonOrder
 from trial_functions import make_periodic_profile
 
 

@@ -1,5 +1,5 @@
 import numpy as np
-from numpy.fft import fft2, ifft2, fftfreq
+from numpy.fft import fft2, fftfreq, ifft2
 
 try:
     from poisson_solver_order import PoissonOrder

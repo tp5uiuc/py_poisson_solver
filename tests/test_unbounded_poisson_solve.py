@@ -1,6 +1,7 @@
-from poisson_solver import PoissonOrder, UnboundedPoissonSolver
-import pytest
 import numpy as np
+import pytest
+
+from poisson_solver import PoissonOrder, UnboundedPoissonSolver
 from trial_functions import make_bump
 
 
