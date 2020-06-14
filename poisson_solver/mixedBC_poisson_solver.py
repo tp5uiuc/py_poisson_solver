@@ -332,7 +332,7 @@ if __name__ == "__main__":
         from unbounded_poisson_solver import make_bump
 
         # Wrap the individual bump functions into one big function
-        def func(inp_X, inp_Y):
+        def oned_bumps(inp_X, inp_Y):
             psi = 0.0 * inp_X
             vort = 0.0 * inp_X
             for i_bump in range(n_bumps):
@@ -361,11 +361,13 @@ if __name__ == "__main__":
         bump_radius = 0.3
         bump_center = [0.5, 0.5]
 
-        def func(inp_X, inp_Y):
+        def oned_bump_x(inp_X, inp_Y):
             psi, vort = make_oned_periodic_bump(
                 inp_X, inp_Y, center=bump_center, radius=bump_radius
             )
             return psi.T, vort.T
+
+    func = oned_bumps
 
     # visualize_solution(func=func, n_points=512)
 
