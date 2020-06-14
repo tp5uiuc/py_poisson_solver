@@ -34,6 +34,36 @@ def make_bump(inp_X, inp_Y, center, radius):
     return psi_expected, vorticity_to_be_fed_in
 
 
+def make_bumps_in_y(inp_X, inp_Y, **kwargs):
+    bump_centers = kwargs.get("bump_centers", None)
+    bump_radii = kwargs.get("bump_radii", None)
+
+    n_bumps = 2
+    if bump_centers is None:
+        bump_centers = []
+        bump_y_start = 0.3
+        bump_y_end = 0.7
+        bump_y_increment = (bump_y_end - bump_y_start) / (n_bumps - 1)
+        for i_bump in range(n_bumps):
+            bump_centers.append([0.5, bump_y_start + bump_y_increment * i_bump])
+
+    if bump_radii is None:
+        bump_radii = []
+        bump_radii_start = 0.3
+        bump_radii_end = 0.4
+        bump_radii_increment = (bump_radii_end - bump_radii_start) / (n_bumps - 1)
+        for i_bump in range(n_bumps):
+            bump_radii.append(bump_radii_start + bump_radii_increment * i_bump)
+
+    psi = 0.0 * inp_X
+    vort = 0.0 * inp_X
+    for center, radius in zip(bump_centers, bump_radii):
+        temp_psi, temp_vort = make_bump(inp_X, inp_Y, center=center, radius=radius)
+        psi += 1e2 * temp_psi
+        vort += 1e2 * temp_vort
+    return psi, vort
+
+
 def make_oned_periodic_bump(inp_X, inp_Y, center, radius):
     R = radius
     c = 10.0

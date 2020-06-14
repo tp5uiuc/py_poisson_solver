@@ -1,5 +1,5 @@
 import numpy as np
-from numpy.fft import fft2, ifft2, fftfreq, fft
+from numpy.fft import fft, fft2, fftfreq, ifft2
 
 try:
     from poisson_solver_order import PoissonOrder
@@ -19,7 +19,7 @@ class MixedBCPoissonSolver:
         self.dx = dx
 
         if periodicity_direction not in ["x", "y"]:
-            raise RuntimeError("perioidicity should be either in x or y")
+            raise RuntimeError("periodicity should be either in x or y")
 
         # By default, periodicity in y direction
         x_size = 2 * self.grid_size
@@ -53,9 +53,14 @@ class MixedBCPoissonSolver:
         if order is PoissonOrder.NON_REGULARIZED:
             GF = 0.0 * DIST
             GF[1:] = -0.5 * np.exp(-np.abs(KY[1:]) * DIST[1:]) / np.abs(KY[1:])
-            # GF[0] is left as zero (no mean mode)
+
+            # Instead of leaving it as 0.0, we solve the 1D poisson equation
+            # here, using the corresponding non-regularized greens function
+            # In 1D, no regularization is needed at [0,0] because the kernel
+            # is non-singular
+            GF[0] = 0.5 * np.abs(np.minimum(x_double, 2.0 - x_double))
         else:
-            from scipy.special import erfc
+            from scipy.special import erf, erfc
 
             regularize_epsilon = 2.0 * dx
             DIST /= regularize_epsilon
@@ -67,15 +72,24 @@ class MixedBCPoissonSolver:
                 def P_m(s, dist):
                     return 0.0 + 0.0 * dist + 0.0 * s
 
+                def P_m_1D_poisson(dist):
+                    return 1.0 + 0.0 * dist
+
             elif order is PoissonOrder.FOURTH_ORDER:
 
                 def P_m(s, dist):
                     return 0.25 + 0.0 * dist + 0.0 * s
 
+                def P_m_1D_poisson(dist):
+                    return 0.5 + 0.0 * dist
+
             elif order is PoissonOrder.SIXTH_ORDER:
 
                 def P_m(s, dist):
                     return 0.3125 + 0.0625 * (s ** 2 - dist ** 2)
+
+                def P_m_1D_poisson(dist):
+                    return (dist ** 2 + 3.0) / 8.0
 
             elif order is PoissonOrder.EIGTH_ORDER:
 
@@ -87,6 +101,9 @@ class MixedBCPoissonSolver:
                         - dist ** 2 * s ** 2 / 48.0
                         + (s ** 4 + dist ** 4) / 96.0
                     )
+
+                def P_m_1D_poisson(dist):
+                    return -(dist ** 4 - 12.0 * dist ** 2 - 15.0) / 48.0
 
             elif order is PoissonOrder.TENTH_ORDER:
 
@@ -101,6 +118,11 @@ class MixedBCPoissonSolver:
                         + (s ** 2 * dist ** 4 - s ** 4 * dist ** 2) / 256.0
                         + (s ** 6 - dist ** 6) / 768.0
                     )
+
+                def P_m_1D_poisson(dist):
+                    return (
+                        dist ** 6 - 23.0 * dist ** 4 + 141.0 * dist ** 2 + 105.0
+                    ) / 384.0
 
             # Compared to paper, add a negative sign
             with np.errstate(divide="ignore", invalid="ignore", over="ignore"):
@@ -119,13 +141,25 @@ class MixedBCPoissonSolver:
                     * P_m(KY, DIST)
                     * np.exp(-0.5 * (KY ** 2 + DIST ** 2))
                 )
+                # Instead of leaving it the zero mode as 0.0,
+                # we solve the 1D poisson equation, regulraized upto
+                # the order of the solution needed
+                GF[0] = regularize_epsilon * (
+                    0.5 * erf(DIST[0] / np.sqrt(2.0)) * DIST[0]
+                    + P_m_1D_poisson(DIST[0])
+                    * np.exp(-0.5 * DIST[0] ** 2)
+                    / np.sqrt(2.0 * np.pi)
+                )
+                # GF[0] = 0.5 * np.abs(np.minimum(x_double, 2.0 - x_double))
 
         greens_function_in_fourier_domain = np.zeros_like(GF, dtype=np.complex)
         # Do FT of rows only
         for i in range(GF.shape[0]):
             greens_function_in_fourier_domain[i] = fft(GF[i])
-            # Set mean mode to 0, dosen't affect solution
-        greens_function_in_fourier_domain[0] = 0.0
+
+        # Set mean mode to 0, dosen't affect solution
+        # if order is not PoissonOrder.NON_REGULARIZED:
+        #     greens_function_in_fourier_domain[0] = 0.0
 
         return greens_function_in_fourier_domain
 
@@ -275,13 +309,51 @@ if __name__ == "__main__":
 
     periodicity_direction = "y"
     if periodicity_direction == "y":
-        # bump properties
-        bump_radius = 0.3
-        bump_center = [0.5, 0.5]
-        func = partial(make_oned_periodic_bump, center=bump_center, radius=bump_radius)
+
+        # # bump properties
+        # bump_radius = 0.3
+        # bump_center = [0.5, 0.5]
+        # func = partial(make_oned_periodic_bump, center=bump_center, radius=bump_radius)
 
         # non-bump
         # func = make_oned_periodic_smooth
+
+        # multiple bumps in
+        bump_radius = 0.3
+        bump_centers = []
+
+        bump_y_start = 0.3
+        bump_y_end = 0.7
+        n_bumps = 2
+        bump_y_increment = (bump_y_end - bump_y_start) / (n_bumps - 1)
+        for i_bump in range(n_bumps):
+            bump_centers.append([0.5, bump_y_start + bump_y_increment * i_bump])
+
+        from unbounded_poisson_solver import make_bump
+
+        # Wrap the individual bump functions into one big function
+        def func(inp_X, inp_Y):
+            psi = 0.0 * inp_X
+            vort = 0.0 * inp_X
+            for i_bump in range(n_bumps):
+                temp_psi, temp_vort = make_bump(
+                    inp_X, inp_Y, center=bump_centers[i_bump], radius=bump_radius
+                )
+                psi += 1e6 * temp_psi
+                vort += 1e6 * temp_vort
+            return psi, vort
+
+        """
+        from unbounded_poisson_solver import make_bump
+        bump_radius = 0.3
+        bump_center = [0.5, 0.5]
+        # func = partial(make_bump, center=bump_center, radius=bump_radius)
+        def func(inp_X, inp_Y):
+            temp_psi, temp_vort = make_bump(
+                inp_X, inp_Y, center=bump_center, radius=bump_radius
+            )
+            return 1e6 * temp_psi, 1e6 * temp_vort
+        """
 
     if periodicity_direction == "x":
         # bump_properties
@@ -296,12 +368,11 @@ if __name__ == "__main__":
             return psi.T, vort.T
 
     # visualize_solution(func=func, n_points=512)
-    # test_poisson_solve_mixedBC(
-    #     func, n_points=64, draw=True, order=PoissonOrder(8)
-    # )
+
+    # test_poisson_solve_mixedBC(func, n_points=64, draw=True, order=PoissonOrder(0))
 
     # report_errors_in_solving_mixedBC_poisson(
-    #     func, periodicity_direction, order=PoissonOrder(10)
+    #     func, periodicity_direction, order=PoissonOrder(6)
     # )
 
     for i_order in range(0, 11, 2):
